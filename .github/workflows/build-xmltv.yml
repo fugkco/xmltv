@@ -10,7 +10,8 @@ on:
 jobs:
   build-xmltv-container:
     runs-on: ubuntu-latest
-
+    env:
+      DOCKER_CONFIG: $HOME/.docker
     steps:
       - name: Checkout
         uses: actions/checkout@v2
