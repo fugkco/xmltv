@@ -54,5 +54,5 @@ jobs:
             ${{ env.IMAGE }}:${{ env.GIT_SHA }}
             ${{ env.IMAGE }}:${{ env.BUILD_VER }}
           push: true
-          secrets: |
-            GIT_AUTH_TOKEN=${{ secrets.DOCKER_PASSWORD }}
+#          secrets: |
+#            GIT_AUTH_TOKEN=${{ secrets.DOCKER_PASSWORD }}
