@@ -53,7 +53,9 @@ FROM alpine:3.12
 ENV HOME="/config"
 
 RUN set -eux; \
-    apk add \
+    apk add --no-cache git; \
+
+    apk add --no-cache \
         `# Dependencies for XMLTV` \
         perl-datetime \
         perl-date-format \
