@@ -40,7 +40,6 @@ RUN set -eux; \
         --strict-deps \
         --components="${INSTALL_COMPONENTS}"; \
     make -j $(nproc); \
-    make test; \
     make DESTDIR=/tmp/xmltv-build install; \
     mkdir -p /tmp/xmltv-build/usr/local/share/perl5/site_perl/HTTP/Cache; \
     mkdir -p /tmp/xmltv-build/usr/local/lib/perl5/site_perl/auto/HTTP/Cache/Transparent; \
@@ -71,7 +70,9 @@ RUN set -eux; \
         perl-xml-parser \
         perl-xml-treepp  \
         perl-xml-twig \
-        perl-xml-writer
+        perl-xml-writer; \
+
+    mkdir -p $HOME/.xmltv
 
 COPY --from=buildstage /tmp/xmltv-build/usr/ /usr/
 
