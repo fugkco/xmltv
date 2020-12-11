@@ -19,10 +19,10 @@ jobs:
     steps:
       - name: Set Environment Variables
         run: |
-          echo "whoami: $(whoami)"
-          echo "pwd: $(pwd)"
-          echo "ls -la:"
-          ls -la
+          export HOME=/config
+          mkdir -p /config/.xmltv
+          mkdir -p /config/.xmltv/cache
+          mkdir -p /config/.xmltv/supplement/tv_grab_uk_tvguide
 
       - name: Checkout
         uses: actions/checkout@v2
@@ -36,17 +36,8 @@ jobs:
 
       - name: Scrape guide
         run: |
-          export HOME=/config
-          mkdir -p /config/.xmltv
-          mkdir -p /config/.xmltv/supplement/tv_grab_uk_tvguide
-
           # ./scripts/get-guide-channels.sh generate-config /config/.xmltv/cache > /config/.xmltv/tv_grab_uk_tvguide.conf
           ./scripts/get-guide-channels.sh generate-mapping > /config/.xmltv/supplement/tv_grab_uk_tvguide/tv_grab_uk_tvguide.map.conf
-          cat <<'EOF' > /config/.xmltv/tv_grab_uk_tvguide.conf
-          cachedir=/config/.xmltv/cache
-          channel=1004
-          channel!1011
-          EOF
 
           find $HOME/ -type f -exec ls -la {} \;
 
@@ -61,6 +52,5 @@ jobs:
           git remote set-url origin https://${{ github.repository_owner }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           echo git remote set-url origin https://${{ github.repository_owner }}:\${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           git add xmltv/uk_tvguide.xml
-          git checkout -b testing$(date -u +%Y%m%d%H%M%S)
           git -c user.name='XMLTV CI' -c user.email='xmltv@github.com' commit -m "tv_grab_uk_tvguide $(date -u +%Y%m%d%H%M%S)"
           git push origin HEAD
