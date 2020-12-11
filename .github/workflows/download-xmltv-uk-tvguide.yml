@@ -1,0 +1,44 @@
+name: xmltv
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'builder/**'
+      - '.github/workflows/build-xmltv.yml'
+
+jobs:
+  build-xmltv-container:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/${{ github.repository }}
+      credentials:
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GHCR_PAT }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: XMLTV cache
+        id: cache-xmltv
+        uses: actions/cache@v2
+        with:
+          path: /config/.xmltv/cache
+          key: ${{ runner.os }}-xmltv-cache
+
+      - name: Set Environment Variables
+        run: |
+          mkdir -p /config/.xmltv
+          mkdir -p /config/.xmltv/supplement/tv_grab_uk_tvguide
+
+#          ./scripts/get-guide-channels.sh generate-config /config/.xmltv/cache > /config/.xmltv/tv_grab_uk_tvguide.conf
+          ./scripts/get-guide-channels.sh generate-mapping > /config/.xmltv/supplement/tv_grab_uk_tvguide/tv_grab_uk_tvguide.map.conf
+          cat <<'EOF' > /config/.xmltv/tv_grab_uk_tvguide.conf
+          cachedir=/config/.xmltv/cache
+          channel=1004
+          channel!1011
+          EOF
+
+
+               mkdir -p xmltv
+          /usr/bin/tv_grab_uk_tvguide --days 1 --quiet > xmltv/uk_tvguide.xml
