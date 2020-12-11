@@ -77,6 +77,8 @@ RUN set -eux; \
         perl-xml-twig \
         perl-xml-writer; \
 
-    mkdir -p $HOME/.xmltv
+    mkdir -p /config/.xmltv; \
+    mkdir -p /config/.xmltv/cache; \
+    mkdir -p /config/.xmltv/supplement/tv_grab_uk_tvguide
 
 COPY --from=buildstage /tmp/xmltv-build/usr/ /usr/
