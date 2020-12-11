@@ -52,6 +52,7 @@ jobs:
 
           mkdir -p xmltv
           /usr/bin/tv_grab_uk_tvguide --days 1 --quiet > xmltv/uk_tvguide.xml
+          cat xmltv/uk_tvguide.xml
 
       - name: Commit new guide
 #        if: ${{ github.event_name == 'cron' }}
