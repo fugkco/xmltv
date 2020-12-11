@@ -78,4 +78,4 @@ RUN set -eux; \
 
 COPY --from=buildstage /tmp/xmltv-build/usr/ /usr/
 
-USER 1000
+USER 1001
