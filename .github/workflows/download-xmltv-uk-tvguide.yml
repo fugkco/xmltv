@@ -34,6 +34,7 @@ jobs:
 
       - name: Set Environment Variables
         run: |
+          export HOME=/config
           mkdir -p /config/.xmltv
           mkdir -p /config/.xmltv/supplement/tv_grab_uk_tvguide
 
@@ -45,6 +46,7 @@ jobs:
           channel!1011
           EOF
 
+          find $HOME/ -type f -exec ls -la {} \;
 
-               mkdir -p xmltv
+          mkdir -p xmltv
           /usr/bin/tv_grab_uk_tvguide --days 1 --quiet > xmltv/uk_tvguide.xml
