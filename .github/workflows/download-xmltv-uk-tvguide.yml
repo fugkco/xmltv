@@ -5,6 +5,8 @@ on:
   push:
     paths:
       - '.github/workflows/download-xmltv-uk-tvguide.yml'
+#  schedule:
+#    - cron: '0 3 * * *'  # every day at midnight
 
 jobs:
   build-xmltv-container:
@@ -32,7 +34,7 @@ jobs:
           path: /config/.xmltv/cache
           key: ${{ runner.os }}-xmltv-cache
 
-      - name: Set Environment Variables
+      - name: Scrape guide
         run: |
           export HOME=/config
           mkdir -p /config/.xmltv
@@ -50,3 +52,11 @@ jobs:
 
           mkdir -p xmltv
           /usr/bin/tv_grab_uk_tvguide --days 1 --quiet > xmltv/uk_tvguide.xml
+
+      - name: Commit new guide
+#        if: ${{ github.event_name == 'cron' }}
+        run: |
+          export HOME=/config
+          git add xmltv/uk_tvguide.xml
+          git checkout -b testing$(date -u +%Y%M%D%H%M%S)
+          git commit -m "tv_grab_uk_tvguide $(date -u +%Y%M%D%H%M%S)"
