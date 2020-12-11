@@ -32,6 +32,10 @@ jobs:
 
       - name: Scrape guide
         run: |
+          env
+
+          ls -la $HOME
+
           # ./scripts/get-guide-channels.sh generate-config $HOME/.xmltv/cache > $HOME/.xmltv/tv_grab_uk_tvguide.conf
           ./scripts/get-guide-channels.sh generate-mapping > $HOME/.xmltv/supplement/tv_grab_uk_tvguide/tv_grab_uk_tvguide.map.conf
 
