@@ -59,4 +59,4 @@ jobs:
           export HOME=/config
           git add xmltv/uk_tvguide.xml
           git checkout -b testing$(date -u +%Y%M%D%H%M%S)
-          git commit -m "tv_grab_uk_tvguide $(date -u +%Y%M%D%H%M%S)"
+          git -c user.name='XMLTV CI' -c user.email='xmltv@github.com' commit -m "tv_grab_uk_tvguide $(date -u +%Y%M%D%H%M%S)"
