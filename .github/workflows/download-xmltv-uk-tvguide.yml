@@ -16,6 +16,13 @@ jobs:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GHCR_PAT }}
     steps:
+      - name: Set Environment Variables
+        run: |
+          echo "whoami: $(whoami)"
+          echo "pwd: $(pwd)"
+          echo "ls -la:"
+          ls -la
+
       - name: Checkout
         uses: actions/checkout@v2
 
