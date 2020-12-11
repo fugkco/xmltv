@@ -55,10 +55,11 @@ ENV HOME="/config"
 RUN set -eux; \
     apk add --no-cache \
         bash \
+        tar \
         git; \
 
+    `# Dependencies for XMLTV` \
     apk add --no-cache \
-        `# Dependencies for XMLTV` \
         perl-datetime \
         perl-date-format \
         perl-date-manip \
