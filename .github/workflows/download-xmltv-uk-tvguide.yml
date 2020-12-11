@@ -12,7 +12,7 @@ env:
   HOME: /config
 
 jobs:
-  build-xmltv-container:
+  scrape-uk-tvguide:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/${{ github.repository }}
@@ -27,19 +27,19 @@ jobs:
         id: cache-xmltv
         uses: actions/cache@v2
         with:
-          path: $HOME/.xmltv/cache
+          path: /config/.xmltv/cache
           key: ${{ runner.os }}-xmltv-cache
 
       - name: Scrape guide
         run: |
           env
 
-          ls -la $HOME
+          ls -la /config
 
-          # ./scripts/get-guide-channels.sh generate-config $HOME/.xmltv/cache > $HOME/.xmltv/tv_grab_uk_tvguide.conf
-          ./scripts/get-guide-channels.sh generate-mapping > $HOME/.xmltv/supplement/tv_grab_uk_tvguide/tv_grab_uk_tvguide.map.conf
+          # ./scripts/get-guide-channels.sh generate-config /config/.xmltv/cache > /config/.xmltv/tv_grab_uk_tvguide.conf
+          ./scripts/get-guide-channels.sh generate-mapping > /config/.xmltv/supplement/tv_grab_uk_tvguide/tv_grab_uk_tvguide.map.conf
 
-          find $HOME/ -type f -exec ls -la {} \;
+          find /config/ -type f -exec ls -la {} \;
 
           mkdir -p xmltv
           /usr/bin/tv_grab_uk_tvguide --days 1 --quiet > xmltv/uk_tvguide.xml
