@@ -36,7 +36,7 @@ jobs:
 
           find /config -type f -exec ls -la {} \;
 
-          # ./scripts/get-guide-channels.sh generate-config /config/.xmltv/cache > /config/.xmltv/tv_grab_uk_tvguide.conf
+          ./scripts/get-guide-channels.sh generate-config /config/.xmltv/cache > /config/.xmltv/tv_grab_uk_tvguide.conf
           ./scripts/get-guide-channels.sh generate-mapping > /config/.xmltv/supplement/tv_grab_uk_tvguide/tv_grab_uk_tvguide.map.conf
 
           find /config/ -type f -exec ls -la {} \;
