@@ -77,5 +77,3 @@ RUN set -eux; \
     mkdir -p $HOME/.xmltv
 
 COPY --from=buildstage /tmp/xmltv-build/usr/ /usr/
-
-USER 1001
