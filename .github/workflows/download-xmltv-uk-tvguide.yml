@@ -1,4 +1,4 @@
-name: xmltv
+name: UK - TVGuide
 
 on:
   workflow_dispatch:
@@ -31,7 +31,7 @@ jobs:
           mkdir -p /config/.xmltv
           mkdir -p /config/.xmltv/supplement/tv_grab_uk_tvguide
 
-#          ./scripts/get-guide-channels.sh generate-config /config/.xmltv/cache > /config/.xmltv/tv_grab_uk_tvguide.conf
+          # ./scripts/get-guide-channels.sh generate-config /config/.xmltv/cache > /config/.xmltv/tv_grab_uk_tvguide.conf
           ./scripts/get-guide-channels.sh generate-mapping > /config/.xmltv/supplement/tv_grab_uk_tvguide/tv_grab_uk_tvguide.map.conf
           cat <<'EOF' > /config/.xmltv/tv_grab_uk_tvguide.conf
           cachedir=/config/.xmltv/cache

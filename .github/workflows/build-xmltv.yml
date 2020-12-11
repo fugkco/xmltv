@@ -1,4 +1,4 @@
-name: xmltv
+name: Build Container
 
 on:
   workflow_dispatch:
