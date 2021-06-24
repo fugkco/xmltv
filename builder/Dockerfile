@@ -1,9 +1,7 @@
-FROM alpine:3.12 AS buildstage
+FROM alpine:3.14 AS buildstage
 
 ENV HOME="/config"
 
-ARG XMLTV_VER="v0.6.3"
-ARG INSTALL_COMPONENTS="tv_grab_na_dtv tv_grab_uk_tvguide tv_grab_combiner"
 RUN set -eux; \
     apk add \
         build-base \
@@ -30,8 +28,11 @@ RUN set -eux; \
     wget -qO- https://cpanmin.us | perl - App::cpanminus; \
     `# HTTP::Cache::Transparent is not available in the repositories` \
     `# anyway, using --notest is probably a bad idea` \
-    cpanm install --notest HTTP::Cache::Transparent; \
+    cpanm install --notest HTTP::Cache::Transparent
 
+ARG XMLTV_VER="v1.0.0"
+ARG INSTALL_COMPONENTS="tv_grab_na_dtv tv_grab_uk_tvguide tv_grab_combiner"
+RUN set -eux; \
     git clone --branch ${XMLTV_VER:-master} https://github.com/XMLTV/xmltv.git /tmp/xmltv; \
     cd /tmp/xmltv; \
     perl Makefile.PL \
@@ -56,6 +57,7 @@ RUN set -eux; \
     apk add --no-cache \
         bash \
         tar \
+        curl \
         git; \
 
     `# Dependencies for XMLTV` \

@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'builder/**'
+      - 'builder/*'
       - '.github/workflows/build-xmltv.yml'
 
 jobs:
