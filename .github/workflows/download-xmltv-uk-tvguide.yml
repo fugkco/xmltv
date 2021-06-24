@@ -50,7 +50,7 @@ jobs:
         run: echo "::set-output name=name::$(date '+%Y%m%d%H%M')"
 
       - uses: ncipollo/release-action@v1
-        if: ${{ github.event_name == 'cron' }}
+        # if: ${{ github.event_name == 'cron' }}
         with:
           artifacts: "xmltv/uk_tvguide.xml"
           body: "${{ steps.name.outputs.name }}"
