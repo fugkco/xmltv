@@ -6,8 +6,8 @@ on:
     paths:
       - '.github/workflows/download-xmltv-uk-tvguide.yml'
       - 'scripts/**'
-#  schedule:
-#    - cron: '0 3 * * *'  # every day at midnight
+  schedule:
+    - cron: '0 3 * * *'  # every day at 3am
 
 env:
   HOME: /config
@@ -33,24 +33,23 @@ jobs:
 
       - name: Scrape guide
         run: |
-          env
-
-          find /config -type f -exec ls -la {} \;
+          set -eux
 
           ./scripts/get-guide-channels.sh generate-config /config/.xmltv/cache > /config/.xmltv/tv_grab_uk_tvguide.conf
           ./scripts/get-guide-channels.sh generate-mapping > /config/.xmltv/supplement/tv_grab_uk_tvguide/tv_grab_uk_tvguide.map.conf
 
-          find /config/ -type f -exec ls -la {} \;
+          days=1
+          [[ ${{ github.event_name }} == "cron" ]] && days=7
 
           mkdir -p xmltv
-          /usr/bin/tv_grab_uk_tvguide --days 7 --quiet > xmltv/uk_tvguide.xml
+          /usr/bin/tv_grab_uk_tvguide --days "$days" --quiet > xmltv/uk_tvguide.xml
           cat xmltv/uk_tvguide.xml
 
       - id: name
         run: echo "::set-output name=name::$(date '+%Y%m%d%H%M')"
 
       - uses: ncipollo/release-action@v1
-        # if: ${{ github.event_name == 'cron' }}
+        if: github.event_name == 'cron'
         with:
           artifacts: "xmltv/uk_tvguide.xml"
           body: "${{ steps.name.outputs.name }}"
