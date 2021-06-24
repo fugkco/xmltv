@@ -63,7 +63,7 @@ get_id_channel_mapping() {
   local channel id name epg_id
 
   while read -r channel; do
-    id="$(awk -F, '{print $1}' <<<"$channel" | xargs)"
+    id="$(awk -F, '{print $1".tvguide.co.uk"}' <<<"$channel" | xargs)"
     name="$(awk -F, '{$1=""; print}' <<<"$channel" | xargs)"
     epg_id="$(get_channel_id "$name")"
     printf "map==%s==%s\n" "$id" "$epg_id"
