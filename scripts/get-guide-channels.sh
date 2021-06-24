@@ -11,51 +11,57 @@ block_list_file=""
 allow_list_file="$dir/guide-allow-list.txt"
 
 get_guides() {
-  wget -qO- 'https://www.tvguide.co.uk' |
-    grep -Eo "loadSystem\('[^\']+'\)" |
-    awk -F\' '{print $2}' |
-    while read -r systemId; do
-      echo "-----------------------------"
-      echo "$systemId"
-      wget -qO- "https://www.tvguide.co.uk/?systemid=$systemId"
-      echo "-----------------------------"
-    done
+  curl --fail --silent --show-error --location \
+    --header 'Content-Type: application/x-www-form-urlencoded' \
+    --data-raw 'thisDay=&thisTime=&gridSpan=&emailaddress=&regionid=9&systemid=5&xn=Show+me+the+channels' \
+    'https://www.tvguide.co.uk/mychannels.asp'
 }
 
 get_all_channels() {
-  # todo maybe better:
-  #  awk -e '/\s*<select name="channelid">/,/<\/select>\s*/' guides | grep -F '<option' | perl -CIO -pe 's/<option value=([^>]+)>([^<]+)<\/option>/$1,$2\n/g'
   get_guides |
-    grep -Eo 'channellistings.asp\?ch=[0-9]+.*title="[^"]+"' |
-    sed -r \
-      -e 's/.*ch=([0-9]+).*title="([^"]+)".*/\1,\2/' \
-      -e 's/ TV listings$//' |
-    sort -t, -k2 -u
+    grep -Eo "(add|delete)Channel\(([0-9]+),\s*'([^']+)'\)" |
+    sed -r "s/^(add|delete)Channel\(([0-9]+),\s*'([^']+)'\)/\2,\3/" |
+    sort -t, -k2
 }
 
 get_blocked_channels() {
   awk -F, '{print $2}' "$block_list_file"
 }
 
-get_allowed_channels() {
+get_channel_list() {
   if [[ -n "$allow_list_file" ]] && [[ -r "$allow_list_file" ]]; then
-    cat "$allow_list_file"
+    sed -r -e 's/([^[:alnum:]])/\\\1/g' -e 's/^/,/' -e 's/$/\$/' "$allow_list_file" | grep -f - <(get_all_channels)
   elif [[ -n "$block_list_file" ]] && [[ -r "$block_list_file" ]]; then
-    grep -v -f <(get_blocked_channels) <(get_all_channels)
+    sed -r -e 's/([^[:alnum:]])/\\\1/g' -e 's/^/,/' -e 's/$/\$/' "$block_list_file" | grep -v -f - <(get_all_channels)
   else
     get_all_channels
   fi
 }
 
+get_allowed_channels() {
+  local id channel
+
+  while read -r channel; do
+    id="$(awk -F, '{print $1}' <<<"$channel" | xargs)"
+    if ! curl --fail --silent --show-error --location --no-buffer "https://www.tvguide.co.uk/channellistings.asp?ch=${id}&cTime=$(date +'%-m/%-d/%Y%%20%-I:00:00%%20%p')&thisTime=&thisDay=" 2>/dev/null | grep -qF '/HighlightImages/'; then
+      continue
+    fi
+
+    echo "$channel"
+  done < <(get_channel_list)
+}
+
 get_channel_id() {
-  channel_id="$1"
-  channel_id="$(sed -r -e 's/\+1/Plus1/g' <<<"$channel_id")"
-  channel_id="$(sed -r -e 's/E!/EEntertainment/g' <<<"$channel_id")"
-  channel_id="$(sed -r -e 's/[^a-zA-Z0-9]+//g' <<<"$channel_id")"
-  printf "%s.uk" "$channel_id" | xargs
+  sed <<<"$1" -r \
+    -e 's/\+1/Plus1/g' \
+    -e 's/E!/EEntertainment/g' \
+    -e 's/[^a-zA-Z0-9]+//g' \
+    -e 's/$/.uk/'
 }
 
 get_id_channel_mapping() {
+  local channel id name epg_id
+
   while read -r channel; do
     id="$(awk -F, '{print $1}' <<<"$channel" | xargs)"
     name="$(awk -F, '{$1=""; print}' <<<"$channel" | xargs)"
@@ -71,7 +77,10 @@ get_tv_grab_channels() {
 }
 
 case "${1:-}" in
-"generate-config") shift; get_tv_grab_channels "$@" ;;
+"generate-config")
+  shift
+  get_tv_grab_channels "$@"
+  ;;
 "generate-mapping") get_id_channel_mapping ;;
 *)
   echo "what do with argument '${1:-unspecified}'? I can only do generate-config | generate-mapping"
