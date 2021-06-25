@@ -2,6 +2,15 @@ name: UK - TVGuide
 
 on:
   workflow_dispatch:
+    inputs:
+      force_release:
+        default: "false"
+        required: false
+        description: "Force a release at the end"
+      days:
+        default: "1"
+        required: false
+        description: "Number of days to scrape"
   push:
     paths:
       - '.github/workflows/download-xmltv-uk-tvguide.yml'
@@ -40,19 +49,33 @@ jobs:
 
           days=1
           [[ ${{ github.event_name }} == "schedule" ]] && days=7
+          [[ ${{ github.event_name }} == "workflow_dispatch" ]] && days=${{ github.event.inputs.days }}
 
           mkdir -p xmltv
           /usr/bin/tv_grab_uk_tvguide --days "$days" --quiet > xmltv/uk_tvguide.xml
           cat xmltv/uk_tvguide.xml
 
       - id: name
-        run: echo "::set-output name=name::$(date '+%Y%m%d%H%M')"
+        name: Determine tag name
+        run: |
+          if [[ ${{ github.event_name }} == "schedule" ]]; then
+            echo "::set-output name=name::$(date '+%Y%m%d')"
+          else
+            echo "::set-output name=name::$(date '+%Y%m%d%H%M')"
+          fi
 
       - uses: ncipollo/release-action@v1
-        if: github.event_name == 'schedule'
+        if: github.event_name == 'schedule' || github.event.inputs.force_release == 'true'
         with:
           artifacts: "xmltv/uk_tvguide.xml"
           body: "${{ steps.name.outputs.name }}"
           name: "${{ steps.name.outputs.name }}"
           tag: "${{ steps.name.outputs.name }}"
           token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Cleanup older releases
+        uses: dev-drprasad/delete-older-releases@v0.2.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          keep_latest: 7
+          delete_tags: true
