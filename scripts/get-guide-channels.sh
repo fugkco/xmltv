@@ -77,10 +77,8 @@ get_tv_grab_channels() {
 }
 
 case "${1:-}" in
-"generate-config")
-  shift
-  get_tv_grab_channels "$@"
-  ;;
+"list-channels") get_channel_list ;;
+"generate-config") shift && get_tv_grab_channels "$@" ;;
 "generate-mapping") get_id_channel_mapping ;;
 *)
   echo "what do with argument '${1:-unspecified}'? I can only do generate-config | generate-mapping"
