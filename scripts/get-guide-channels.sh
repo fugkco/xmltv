@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 
-#set -euo pipefail
-
-#./get-guide-channels.sh generate-config  > /media/ext/services/tvheadend/config/.xmltv/tv_grab_uk_tvguide.conf
-#./get-guide-channels.sh generate-mapping > /media/ext/services/tvheadend/config/.xmltv/supplement/tv_grab_uk_tvguide/tv_grab_uk_tvguide.map.conf
+set -euo pipefail
 
 dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 block_list_file=""
@@ -40,14 +37,15 @@ get_channel_list() {
     get_all_channels
   fi
 }
-1012
+
 get_allowed_channels() {
-  local id channel
+  local id channel content
 
   while read -r channel; do
     id="$(awk -F, '{print $1}' <<<"$channel" | xargs)"
     name="$(awk -F, '{print $2}' <<<"$channel" | xargs)"
-    if ! curl --fail --silent --show-error --location --no-buffer "https://www.tvguide.co.uk/channellistings.asp?ch=${id}&cTime=$(date +'%-m/%-d/%Y%%20%-I:00:00%%20%p')&thisTime=&thisDay=" 2>/dev/null | grep -qF '/HighlightImages/'; then
+    content="$(curl --fail --silent --show-error --location --no-buffer "https://www.tvguide.co.uk/channellistings.asp?ch=${id}&cTime=$(date +'%-m/%-d/%Y%%20%-I:00:00%%20%p')&thisTime=&thisDay=")"
+    if ! grep -qF '/HighlightImages/' <<<"$content"; then
       >&2 printf "channel %s (name=%s) does not seem to have valid pages. Skipping..\n" "$id" "$name"
       continue
     fi
