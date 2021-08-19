@@ -41,19 +41,7 @@ jobs:
           key: ${{ runner.os }}-xmltv-cache
 
       - name: Scrape guide
-        run: |
-          set -eux
-
-          ./scripts/get-guide-channels.sh generate-config /config/.xmltv/cache > /config/.xmltv/tv_grab_uk_tvguide.conf
-          ./scripts/get-guide-channels.sh generate-mapping > /config/.xmltv/supplement/tv_grab_uk_tvguide/tv_grab_uk_tvguide.map.conf
-
-          days=1
-          [[ ${{ github.event_name }} == "schedule" ]] && days=7
-          [[ ${{ github.event_name }} == "workflow_dispatch" ]] && days=${{ github.event.inputs.days }}
-
-          mkdir -p xmltv
-          /usr/bin/tv_grab_uk_tvguide --days "$days" --quiet > xmltv/uk_tvguide.xml
-          cat xmltv/uk_tvguide.xml
+        run: ./scripts/run-scraper.sh ${{ github.event_name }} ${{ github.event.inputs.days }}
 
       - id: name
         name: Determine tag name
@@ -72,6 +60,7 @@ jobs:
           name: "${{ steps.name.outputs.name }}"
           tag: "${{ steps.name.outputs.name }}"
           token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Cleanup older releases
         uses: dev-drprasad/delete-older-releases@v0.2.0
         env:
