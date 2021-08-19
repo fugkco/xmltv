@@ -29,5 +29,5 @@ esac
 
 mkdir -p xmltv
 # ignore errors as it will still output the XML for valid channels
-/usr/bin/tv_grab_uk_tvguide --days "$days" --quiet > xmltv/uk_tvguide.xml || true
+/usr/bin/tv_grab_uk_tvguide --days "$days" --offset "$offset" --quiet > xmltv/uk_tvguide.xml || true
 cat xmltv/uk_tvguide.xml
