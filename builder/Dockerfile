@@ -56,9 +56,10 @@ ENV HOME="/config"
 RUN set -eux; \
     apk add --no-cache \
         bash \
-        tar \
+        coreutils \
         curl \
-        git; \
+        git \
+        tar; \
 
     `# Dependencies for XMLTV` \
     apk add --no-cache \
