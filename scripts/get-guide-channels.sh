@@ -65,14 +65,20 @@ get_channel_id() {
 }
 
 get_id_channel_mapping() {
-  local channel id name epg_id
+  local id name epg_id conf_file
+  conf_file="${1:-}"
 
-  while read -r channel; do
-    id="$(awk -F',' '{print $1".tvguide.co.uk"}' <<<"$channel" | xargs)"
-    name="$(awk -F',' '{$1=""; print}' <<<"$channel" | xargs)"
+  while IFS=, read -r id name; do
+    id="$(awk -F',' '{print $1".tvguide.co.uk"}' <<<"$id" | xargs)"
     epg_id="$(get_channel_id "$name")"
     printf "map==%s==%s\n" "$id" "$epg_id"
-  done < <(get_allowed_channels)
+  done < <(
+    if [[ -n "$conf_file" ]]; then
+      awk -F'=' '/^channel=/{print "^"$2","}' "$conf_file" | grep -E -f - <(get_channel_list)
+    else
+      get_allowed_channels
+    fi
+  )
 }
 
 get_tv_grab_channels() {
@@ -84,7 +90,7 @@ get_tv_grab_channels() {
 case "${1:-}" in
 "list-channels") get_channel_list ;;
 "generate-config") shift && get_tv_grab_channels "$@" ;;
-"generate-mapping") get_id_channel_mapping ;;
+"generate-mapping") shift && get_id_channel_mapping "$@" ;;
 *)
   echo "what do with argument '${1:-unspecified}'? I can only do generate-config | generate-mapping"
   exit 1
