@@ -24,7 +24,6 @@ RUN set -eux; \
         perl-xml-treepp  \
         perl-xml-twig \
         perl-xml-writer; \
-
     wget -qO- https://cpanmin.us | perl - App::cpanminus; \
     `# HTTP::Cache::Transparent is not available in the repositories` \
     `# anyway, using --notest is probably a bad idea` \
@@ -48,7 +47,7 @@ RUN set -eux; \
     cp /usr/local/lib/perl5/site_perl/auto/HTTP/Cache/Transparent/.packlist /tmp/xmltv-build/usr/local/lib/perl5/site_perl/auto/HTTP/Cache/Transparent/.packlist
 
 
-FROM alpine:3.12
+FROM alpine:3.14
 
 # environment settings
 ENV HOME="/config"
@@ -60,7 +59,6 @@ RUN set -eux; \
         curl \
         git \
         tar; \
-
     `# Dependencies for XMLTV` \
     apk add --no-cache \
         perl-datetime \
@@ -79,7 +77,6 @@ RUN set -eux; \
         perl-xml-treepp  \
         perl-xml-twig \
         perl-xml-writer; \
-
     mkdir -p /config/.xmltv; \
     mkdir -p /config/.xmltv/cache; \
     mkdir -p /config/.xmltv/supplement/tv_grab_uk_tvguide

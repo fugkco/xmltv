@@ -10,10 +10,7 @@ E4 +1
 Comedy Central +1
 Discovery Science
 Horror Channel +1
-Disney XD HD
-Disney Channel HD
-Disney Junior HD
-Nick Jr +1
+Nick Jr. +1
 Food Network +1
 Virgin Media One
 Virgin Media Two
@@ -30,7 +27,3 @@ Sky Replay
 W HD
 Club MTV
 MTV Live HD
-VH1
-Travel Channel
-Vice
-Vice HD

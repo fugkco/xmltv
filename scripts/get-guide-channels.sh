@@ -25,7 +25,7 @@ get_all_channels() {
 }
 
 get_blocked_channels() {
-  awk -F, '{print $2}' "$block_list_file"
+  awk -F',' '{print $2}' "$block_list_file"
 }
 
 get_channel_list() {
@@ -42,15 +42,15 @@ get_allowed_channels() {
   local id channel content
 
   while read -r channel; do
-    id="$(awk -F, '{print $1}' <<<"$channel" | xargs)"
-    name="$(awk -F, '{print $2}' <<<"$channel" | xargs)"
+    id="$(awk -F',' '{print $1}' <<<"$channel" | xargs)"
+    name="$(awk -F',' '{print $2}' <<<"$channel" | xargs)"
     content="$(curl --fail --silent --show-error --location --no-buffer "https://www.tvguide.co.uk/channellistings.asp?ch=${id}&cTime=$(date +'%-m/%-d/%Y%%20%-I:00:00%%20%p')&thisTime=&thisDay=")"
     if ! grep -qF '/HighlightImages/' <<<"$content"; then
       >&2 printf "channel %s (name=%s) does not seem to have valid pages. Skipping..\n" "$id" "$name"
       continue
     fi
 
-    >&2 printf "channel %s (name=%s) is valid!\n" "$id" "$name"
+    >&2 printf 'channel %s (name=%s) is valid!\n' "$id" "$name"
 
     echo "$channel"
   done < <(get_channel_list | grep -vE ',$')
@@ -68,8 +68,8 @@ get_id_channel_mapping() {
   local channel id name epg_id
 
   while read -r channel; do
-    id="$(awk -F, '{print $1".tvguide.co.uk"}' <<<"$channel" | xargs)"
-    name="$(awk -F, '{$1=""; print}' <<<"$channel" | xargs)"
+    id="$(awk -F',' '{print $1".tvguide.co.uk"}' <<<"$channel" | xargs)"
+    name="$(awk -F',' '{$1=""; print}' <<<"$channel" | xargs)"
     epg_id="$(get_channel_id "$name")"
     printf "map==%s==%s\n" "$id" "$epg_id"
   done < <(get_allowed_channels)
@@ -78,7 +78,7 @@ get_id_channel_mapping() {
 get_tv_grab_channels() {
   [[ -n "${1:-}" ]] && printf "cachedir=%s\n" "$(realpath "$1")"
 
-  awk -F, '{print "channel="$1}' < <(get_allowed_channels) | sort -u
+  awk -F',' '{print "channel="$1}' < <(get_allowed_channels) | sort -u
 }
 
 case "${1:-}" in
