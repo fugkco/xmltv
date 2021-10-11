@@ -5,12 +5,13 @@ ENV HOME="/config"
 RUN set -eux; \
     apk add \
         build-base \
-        make \
         git \
-        perl-dev \
-        perl-datetime \
+        make \
         perl-date-format \
         perl-date-manip \
+        perl-datetime \
+        perl-datetime-format-strptime; \
+        perl-dev \
         perl-file-slurp \
         perl-html-tree \
         perl-json \
@@ -61,9 +62,10 @@ RUN set -eux; \
         tar; \
     `# Dependencies for XMLTV` \
     apk add --no-cache \
-        perl-datetime \
         perl-date-format \
         perl-date-manip \
+        perl-datetime \
+        perl-datetime-format-strptime; \
         perl-file-slurp \
         perl-html-tree \
         perl-json \
