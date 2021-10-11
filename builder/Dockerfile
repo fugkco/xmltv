@@ -10,7 +10,7 @@ RUN set -eux; \
         perl-date-format \
         perl-date-manip \
         perl-datetime \
-        perl-datetime-format-strptime; \
+        perl-datetime-format-strptime \
         perl-dev \
         perl-file-slurp \
         perl-html-tree \
@@ -65,7 +65,7 @@ RUN set -eux; \
         perl-date-format \
         perl-date-manip \
         perl-datetime \
-        perl-datetime-format-strptime; \
+        perl-datetime-format-strptime \
         perl-file-slurp \
         perl-html-tree \
         perl-json \
