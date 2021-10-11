@@ -5,25 +5,26 @@ set -euxo pipefail
 event_name="$1"
 event_input_days="${2:-}"
 
-mkdir -p xmltv
+mkdir -p "xmltv" "$HOME/.xmltv" "$HOME/.xmltv/supplement/tv_grab_uk_tvguide"
 
 ./scripts/get-guide-channels.sh generate-config "$HOME/.xmltv/cache" > "$HOME/.xmltv/tv_grab_uk_tvguide.conf"
 ./scripts/get-guide-channels.sh generate-mapping "$HOME/.xmltv/tv_grab_uk_tvguide.conf" > "$HOME/.xmltv/supplement/tv_grab_uk_tvguide/tv_grab_uk_tvguide.map.conf"
 
+latest_release="$(git tag -l | sort -V | tail -n1)"
+curl --fail --silent --show-error --location \
+   --output "$latest_release.xml" \
+    "https://github.com/fugkco/xmltv/releases/download/${latest_release}/uk_tvguide.xml"
+tv_split --output 'xmltv/split-%Y%m%d.xml' "$latest_release.xml"
+
 days=1
 offset=0
 case "$event_name" in
+  push) true; ;;
   workflow_dispatch) days=$event_input_days; ;;
   schedule)
     offset=7
     days=0
-    latest_release="$(git tag -l | sort -V | tail -n1)"
     new_release_start="$(date '+%Y%m%d')"
-
-    curl --fail --silent --show-error --location \
-       --output "$latest_release.xml" \
-        "https://github.com/fugkco/xmltv/releases/download/${latest_release}/uk_tvguide.xml"
-    tv_split --output 'xmltv/split-%Y%m%d.xml' "$latest_release.xml"
 
     echo "latest_release < new_release_start"
     while (( new_release_start > latest_release )); do
