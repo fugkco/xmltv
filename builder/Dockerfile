@@ -59,6 +59,7 @@ RUN set -eux; \
         coreutils \
         curl \
         git \
+        jq \
         tar; \
     `# Dependencies for XMLTV` \
     apk add --no-cache \

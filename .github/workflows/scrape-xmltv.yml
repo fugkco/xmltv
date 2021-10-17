@@ -22,7 +22,7 @@ env:
   HOME: /config
 
 jobs:
-  uk-tvguide:
+  scrape:
     runs-on: ubuntu-latest
     strategy:
       matrix:
