@@ -1,11 +1,8 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
-
 dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-block_list_file=""
-#block_list_file="$dir/guide-block-list.txt"
-allow_list_file="$dir/guide-allow-list.txt"
+
+channelsFile="$dir/channels.txt"
 
 get_guides() {
   for systemid in 3 5 25; do
@@ -24,18 +21,8 @@ get_all_channels() {
     sort -t, -k2
 }
 
-get_blocked_channels() {
-  awk -F',' '{print $2}' "$block_list_file"
-}
-
 get_channel_list() {
-  if [[ -n "$allow_list_file" ]] && [[ -r "$allow_list_file" ]]; then
-    sed -r -e 's/([^[:alnum:]])/\\\1/g' -e 's/^/,/' -e 's/$/\$/' "$allow_list_file" | grep -E -f - <(get_all_channels)
-  elif [[ -n "$block_list_file" ]] && [[ -r "$block_list_file" ]]; then
-    sed -r -e 's/([^[:alnum:]])/\\\1/g' -e 's/^/,/' -e 's/$/\$/' "$block_list_file" | grep -E -v -f - <(get_all_channels)
-  else
-    get_all_channels
-  fi
+  sed -r -e 's/([^[:alnum:]])/\\\1/g' -e 's/^/,/' -e 's/$/\$/' "$channelsFile" | grep -E -f - <(get_all_channels)
 }
 
 get_allowed_channels() {
@@ -46,11 +33,11 @@ get_allowed_channels() {
     name="$(awk -F',' '{print $2}' <<<"$channel" | xargs)"
     content="$(curl --fail --silent --show-error --location --no-buffer "https://www.tvguide.co.uk/channellistings.asp?ch=${id}&cTime=$(date +'%-m/%-d/%Y%%20%-I:00:00%%20%p')&thisTime=&thisDay=")"
     if ! grep -qF '/HighlightImages/' <<<"$content"; then
-      >&2 printf "channel %s (name=%s) does not seem to have valid pages. Skipping..\n" "$id" "$name"
+      printf >&2 "channel %s (name=%s) does not seem to have valid pages. Skipping..\n" "$id" "$name"
       continue
     fi
 
-    >&2 printf 'channel %s (name=%s) is valid!\n' "$id" "$name"
+    printf >&2 'channel %s (name=%s) is valid!\n' "$id" "$name"
 
     echo "$channel"
   done < <(get_channel_list | grep -vE ',$')
@@ -87,12 +74,10 @@ get_tv_grab_channels() {
   awk -F',' '{print "channel="$1}' < <(get_allowed_channels) | sort -u
 }
 
-case "${1:-}" in
-"list-channels") get_channel_list ;;
-"generate-config") shift && get_tv_grab_channels "$@" ;;
-"generate-mapping") shift && get_id_channel_mapping "$@" ;;
-*)
-  echo "what do with argument '${1:-unspecified}'? I can only do generate-config | generate-mapping"
-  exit 1
-  ;;
-esac
+main() {
+  mkdir -p "$HOME/.xmltv/supplement/tv_grab_uk_tvguide"
+  get_tv_grab_channels "$HOME/.xmltv/cache" >"$HOME/.xmltv/tv_grab_uk_tvguide.conf"
+  get_id_channel_mapping "$HOME/.xmltv/tv_grab_uk_tvguide.conf" >"$HOME/.xmltv/supplement/tv_grab_uk_tvguide/tv_grab_uk_tvguide.map.conf"
+}
+
+main
