@@ -34,7 +34,7 @@ push) true ;;
 workflow_dispatch) days=$event_input_days ;;
 schedule)
   offset=7
-  days=0
+  days=1
   new_release_start="$(date '+%Y%m%d')"
 
   echo "latest_release < new_release_start"
