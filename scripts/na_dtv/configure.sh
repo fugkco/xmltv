@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euxo pipefail
+
 dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 
 zip=30016
@@ -16,7 +18,7 @@ get_tv_grab_channels() {
 zip=${zip}
 timezone=${timezone}
 EOF
-  curl -fsSL "$channelListURL" | jq -r --argjson channels "${channelsJson}" '.channels[] | "channel\(if .chName | IN($channels[]) then "=" else "!" end)\(("0" * (4-(.chId|tostring|length)))+(.chId|tostring)).directv.com" '
+  curl -fsSL "$channelListURL" | jq -r --argjson channels "${channelsJson}" '.channels | sort_by(.chNum) | .[] | "channel\(if .chName | IN($channels[]) then "=" else "!" end)\(("0" * (4-(.chNum|tostring|length)))+(.chNum|tostring)).directv.com"'
 }
 
 main() {
