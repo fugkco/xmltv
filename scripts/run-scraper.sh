@@ -50,7 +50,7 @@ esac
 # ignore errors as it will still output the XML for valid channels
 "/usr/bin/tv_grab_$grabber" --days "$days" --offset "$offset" --quiet >"xmltv/$grabber.xml" || true
 
-tv_sort --by-channel --output "xmltv/$grabber.xml" "xmltv/$grabber.xml"
+tv_sort --by-channel --output "xmltv/$grabber.xml" "xmltv/$grabber.xml" || true
 find xmltv -name "${grabber}-split-*" -print0 | sort --zero-terminated --version-sort | tail --zero-terminated --lines=6 | xargs -r -t -0 tv_sort --by-channel --output "xmltv/${grabber}_hist.xml"
 
 tv_count -i "xmltv/$grabber.xml"
