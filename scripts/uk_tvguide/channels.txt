@@ -21,6 +21,7 @@ Nick Jr. +1
 NOW Sky Max
 NOW Sky Max HD
 Sky Cinema Animation HD
+Sky Cinema Christmas HD
 Sky Cinema Drama HD
 Sky Cinema Family HD
 Sky Cinema Greats HD
@@ -35,6 +36,8 @@ Sky Max HD
 Sky Nature
 Sky Nature HD
 Sky Replay
+Sky Showcase
+Sky Showcase HD
 Virgin Media One
 Virgin Media Three
 Virgin Media Two
